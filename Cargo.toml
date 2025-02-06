@@ -6,7 +6,16 @@ edition = "2021"
 [dependencies]
 bevy = { version = "0.15.1", features = ["dynamic_linking"] }
 lightyear = "0.19.0"
+lightyear_examples_common = "0.19.0"
 serde = "1.0.217"
+
+[features]
+default = ["client", "server", "gui", "lightyear_examples_common/default"]
+websocket = ["lightyear_examples_common/websocket"]
+client = ["lightyear_examples_common/client", "gui"]
+server = ["lightyear_examples_common/server"]
+gui = ["lightyear_examples_common/gui"]
+steam = ["lightyear_examples_common/steam"]
 
 # Enable a small amount of optimization in the dev profile.
 [profile.dev]
