@@ -19,7 +19,11 @@
                     "kind": "bin"
                 }
             },
-            "args": [],
+            "args": [
+                "client",
+                "-c",
+                "1"
+            ],
             "cwd": "${workspaceFolder}"
         },
         {

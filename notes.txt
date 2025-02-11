@@ -1,0 +1,3 @@
+scp bevytest adam@4.210.230.207:~/
+
+cargo build --release --no-default-features --features server
