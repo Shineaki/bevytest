@@ -91,7 +91,10 @@ pub(crate) fn buffer_input(
 /// This works because we only predict the user's controlled entity.
 /// If we were predicting more entities, we would have to only apply movement to the player owned one.
 fn player_movement(
-    mut position_query: Query<&mut PlayerPosition, With<Predicted>>,
+    mut position_query: Query<
+        (&mut PlayerPosition, &mut Transform),
+        (With<Sprite>, With<Predicted>),
+    >,
     mut input_reader: EventReader<InputEvent<Inputs>>,
 ) {
     for input in input_reader.read() {
@@ -100,8 +103,11 @@ fn player_movement(
             if input == &Inputs::None {
                 continue;
             }
-            for position in position_query.iter_mut() {
+            for (position, transform) in &mut position_query.iter_mut() {
                 shared::shared_movement_behaviour(position, input);
+            }
+            for (position, mut transform) in &mut position_query {
+                transform.translation = Vec3::new(position.0.x, position.0.y, 0.0);
             }
         }
     }
@@ -141,27 +147,43 @@ pub(crate) fn receive_player_id_insert(mut reader: EventReader<ComponentInsertEv
 /// When the predicted copy of the client-owned entity is spawned, do stuff
 /// - assign it a different saturation
 /// - keep track of it in the Global resource
-pub(crate) fn handle_predicted_spawn(mut predicted: Query<&mut PlayerColor, Added<Predicted>>) {
-    for mut color in predicted.iter_mut() {
-        let hsva = Hsva {
-            saturation: 0.4,
-            ..Hsva::from(color.0)
-        };
-        color.0 = Color::from(hsva);
+pub(crate) fn handle_predicted_spawn(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    predicted: Query<Entity, Added<Predicted>>,
+) {
+    for pq in &predicted {
+        commands
+            .entity(pq)
+            .insert(Sprite::from_image(asset_server.load("elf_m.png")));
     }
+    // for mut color in predicted.iter_mut() {
+    //     let hsva = Hsva {
+    //         saturation: 0.4,
+    //         ..Hsva::from(color.0)
+    //     };
+    //     color.0 = Color::from(hsva);
+    // }
 }
 
 /// When the predicted copy of the client-owned entity is spawned, do stuff
 /// - assign it a different saturation
 /// - keep track of it in the Global resource
 pub(crate) fn handle_interpolated_spawn(
-    mut interpolated: Query<&mut PlayerColor, Added<Interpolated>>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    interpolated: Query<Entity, Added<Interpolated>>,
 ) {
-    for mut color in interpolated.iter_mut() {
-        let hsva = Hsva {
-            saturation: 0.1,
-            ..Hsva::from(color.0)
-        };
-        color.0 = Color::from(hsva);
+    // for mut color in interpolated.iter_mut() {
+    //     let hsva = Hsva {
+    //         saturation: 0.1,
+    //         ..Hsva::from(color.0)
+    //     };
+    //     color.0 = Color::from(hsva);
+    // }
+    for pq in &interpolated {
+        commands
+            .entity(pq)
+            .insert(Sprite::from_image(asset_server.load("elf_m.png")));
     }
 }
